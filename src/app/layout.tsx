@@ -29,9 +29,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const metadata: Metadata = {
+  applicationName: "Techzolo WhatsApp CRM",
   title: {
-    default: "wacrm",
-    template: "%s — wacrm",
+    default: "Techzolo WhatsApp CRM",
+    template: "%s — Techzolo WhatsApp CRM",
   },
   robots: {
     index: false,

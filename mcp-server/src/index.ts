@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // ============================================================
-// wacrm MCP server — entry point.
+// Techzolo WhatsApp CRM MCP server — entry point.
 //
-// A stdio Model Context Protocol server that exposes the wacrm
+// A stdio Model Context Protocol server that exposes the Techzolo WhatsApp CRM
 // public API (`/api/v1`) as MCP tools, so an MCP client (Claude
 // Desktop, Cursor, etc.) can drive a self-hosted WhatsApp CRM in
 // natural language.
@@ -33,13 +33,13 @@ async function main(): Promise<void> {
 
   // Stderr only — stdout is reserved for the MCP protocol.
   console.error(
-    `wacrm MCP server v${VERSION} ready — instance ${config.baseUrl}, ` +
+    `Techzolo WhatsApp CRM MCP server v${VERSION} ready — instance ${config.baseUrl}, ` +
       `tool groups: ${groups.join(', ')}` +
       (config.enableWrites ? '' : ' (read-only; set WACRM_ENABLE_WRITES to allow changes)'),
   );
 }
 
 main().catch((err) => {
-  console.error(`Failed to start wacrm MCP server: ${(err as Error).message}`);
+  console.error(`Failed to start Techzolo WhatsApp CRM MCP server: ${(err as Error).message}`);
   process.exit(1);
 });

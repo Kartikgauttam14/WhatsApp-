@@ -18,12 +18,12 @@ body:
         - It fixes a correctness problem in the template.
         - It makes the template cleaner for the next forker (reducing
           friction, removing footguns).
-        - It's in scope for "a generic WhatsApp CRM template" rather
+        - It's in scope for "Techzolo WhatsApp CRM" rather
           than a bet on your specific workflow.
 
         If the feature is really for your own deployment, fork and
         build it there — see
-        [CONTRIBUTING.md](https://github.com/ArnasDon/wacrm/blob/main/CONTRIBUTING.md).
+        [CONTRIBUTING.md](https://github.com/Kartikgauttam14/WhatsApp-/blob/main/CONTRIBUTING.md).
 
   - type: textarea
     id: problem
