@@ -456,7 +456,7 @@ import {
   buildSendComponents,
   type SendTimeParams,
 } from './template-send-builder'
-import { buildCarouselSendComponent, type MetaTemplateComponent, type CarouselSendComponent } from './template-carousel'
+import { buildCarouselSendComponent, uploadCarouselCardMedia, type MetaTemplateComponent, type CarouselSendComponent } from './template-carousel'
 
 export interface SendTemplateMessageArgs {
   phoneNumberId: string
@@ -547,7 +547,11 @@ export async function sendTemplateMessage(
         throw new Error('The approved Meta template does not match the selected name, language or status. Sync templates and retry.')
       }
       const carousel = definition.components.find(c => c.type === 'CAROUSEL')
-      if (carousel) components.push(buildCarouselSendComponent(template, carousel))
+      if (carousel) {
+        components.push(await uploadCarouselCardMedia(
+          buildCarouselSendComponent(template, carousel), phoneNumberId, accessToken, META_API_BASE,
+        ))
+      }
     }
     if (components.length > 0) {
       templatePayload.components = components
