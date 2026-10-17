@@ -456,6 +456,7 @@ import {
   buildSendComponents,
   type SendTimeParams,
 } from './template-send-builder'
+import { buildCarouselSendComponent, type MetaTemplateComponent, type CarouselSendComponent } from './template-carousel'
 
 export interface SendTemplateMessageArgs {
   phoneNumberId: string
@@ -521,7 +522,7 @@ export async function sendTemplateMessage(
   }
 
   if (template) {
-    const components = buildSendComponents(template, {
+    const components: Array<ReturnType<typeof buildSendComponents>[number] | CarouselSendComponent> = buildSendComponents(template, {
       // Legacy callers pass body values in `params`; fold them into
       // `messageParams.body` so the new path covers them too.
       body: messageParams?.body ?? params,
@@ -530,6 +531,24 @@ export async function sendTemplateMessage(
       headerMediaId: messageParams?.headerMediaId,
       buttonParams: messageParams?.buttonParams,
     })
+    // Carousel definitions cannot be represented by the legacy local row.
+    // A carousel has no top-level header/buttons, so inspect that class of
+    // synced templates using its exact Meta ID rather than sending body only.
+    if (template.meta_template_id && !template.header_type && !template.buttons?.length) {
+      const definitionResponse = await fetch(
+        `${META_API_BASE}/${encodeURIComponent(template.meta_template_id)}?fields=name,language,status,components`,
+        { headers: { Authorization: `Bearer ${accessToken}` }, signal: AbortSignal.timeout(10_000) },
+      )
+      if (!definitionResponse.ok) {
+        await throwMetaError(definitionResponse, 'Could not load the approved template format')
+      }
+      const definition: { name: string; language: string; status: string; components: MetaTemplateComponent[] } = await definitionResponse.json()
+      if (definition.name !== templateName || definition.language !== language || definition.status !== 'APPROVED' || !Array.isArray(definition.components)) {
+        throw new Error('The approved Meta template does not match the selected name, language or status. Sync templates and retry.')
+      }
+      const carousel = definition.components.find(c => c.type === 'CAROUSEL')
+      if (carousel) components.push(buildCarouselSendComponent(template, carousel))
+    }
     if (components.length > 0) {
       templatePayload.components = components
     }
