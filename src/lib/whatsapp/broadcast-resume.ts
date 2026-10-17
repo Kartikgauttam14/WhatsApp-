@@ -23,6 +23,7 @@ import { chunk } from '@/lib/supabase/paged-query';
 import { decrypt } from '@/lib/whatsapp/encryption';
 import { resolveTemplateRow } from '@/lib/whatsapp/template-body';
 import { sanitizePhoneForMeta, isValidE164 } from '@/lib/whatsapp/phone-utils';
+import { FLORAL_TEMPLATE_NAME } from '@/lib/floral-campaign-input';
 
 /** Which recipients a resume pass picks up. */
 export type ResumeScope = 'pending' | 'failed' | 'all';
@@ -154,6 +155,9 @@ export async function planBroadcastResume(
 
   if (bcError || !broadcast) {
     throw new BroadcastError('not_found', 'Broadcast not found', 404);
+  }
+  if (broadcast.template_name === FLORAL_TEMPLATE_NAME) {
+    throw new BroadcastError('paced_campaign_required', 'Use the Floral campaign page to send this template at one per minute.', 409);
   }
 
   const statuses = scopeStatuses(scope);

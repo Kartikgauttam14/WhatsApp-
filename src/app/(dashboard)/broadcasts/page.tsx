@@ -188,6 +188,7 @@ export default function BroadcastsPage() {
             {t('subtitle')}
           </p>
         </div>
+        <Button variant="outline" onClick={() => router.push('/broadcasts/floral')}>Floral campaign · 1/min</Button>
         <GatedButton
           canAct={canCreate}
           gateReason={tGate('reasons.createBroadcasts')}

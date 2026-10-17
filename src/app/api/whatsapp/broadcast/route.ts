@@ -16,6 +16,7 @@ import {
   RATE_LIMITS,
 } from '@/lib/rate-limit'
 import { getT } from '@/lib/i18n/translate'
+import { FLORAL_TEMPLATE_NAME } from '@/lib/floral-campaign-input'
 
 const t = getT('Api')
 
@@ -93,6 +94,8 @@ export async function POST(request: Request) {
       template_language,
       template_params,
     } = body
+
+    if (template_name === FLORAL_TEMPLATE_NAME) return NextResponse.json({ error: 'Use the Floral campaign page to send this template at one per minute.' }, { status: 409 })
 
     // Normalize to a list of {phone, params} regardless of shape.
     let recipients: NewRecipient[]

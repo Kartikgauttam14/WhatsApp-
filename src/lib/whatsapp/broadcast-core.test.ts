@@ -20,6 +20,11 @@ vi.mock('@/lib/api/v1/contacts', () => ({
 const db = {} as SupabaseClient;
 
 describe('createBroadcast validation', () => {
+  it('keeps the floral template off the unpaced fan-out path', async () => {
+    await expect(createBroadcast(db, 'acc', 'user', {
+      templateName: 'mansam_floral_collection', recipients: [{ to: '+919876543210' }],
+    })).rejects.toMatchObject({ code: 'paced_campaign_required', status: 409 });
+  });
   it('rejects a missing template_name', async () => {
     await expect(
       createBroadcast(db, 'acc', 'user', {

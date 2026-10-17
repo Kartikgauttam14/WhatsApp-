@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+vi.mock('@/lib/floral-campaign-status', () => ({ mirrorFloralDeliveryStatus: vi.fn(async () => {}) }))
 
 // Shared, hoisted state the module mocks close over. Reset per test.
 const h = vi.hoisted(() => ({

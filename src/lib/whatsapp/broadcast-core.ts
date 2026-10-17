@@ -27,6 +27,7 @@ import {
 } from '@/lib/whatsapp/phone-utils';
 import { resolveTemplateRow } from '@/lib/whatsapp/template-body';
 import type { MessageTemplate } from '@/types';
+import { FLORAL_TEMPLATE_NAME } from '@/lib/floral-campaign-input';
 import { findOrCreateContact } from '@/lib/api/v1/contacts';
 
 /** Thrown by createBroadcast on a caller-visible failure; route maps it. */
@@ -88,6 +89,10 @@ export async function createBroadcast(
   params: CreateBroadcastParams
 ): Promise<BroadcastPlan> {
   const { name, templateName, recipients } = params;
+
+  if (templateName === FLORAL_TEMPLATE_NAME) {
+    throw new BroadcastError('paced_campaign_required', 'Use the Floral campaign page to send this template at one per minute.', 409);
+  }
 
   if (!templateName) {
     throw new BroadcastError('bad_request', "'template_name' is required", 400);

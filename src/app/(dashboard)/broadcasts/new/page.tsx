@@ -192,7 +192,7 @@ export default function NewBroadcastPage() {
             <Step1ChooseTemplate
               selectedTemplate={template}
               onSelect={setTemplate}
-              onNext={() => setCurrentStep(1)}
+          onNext={() => template?.name === 'mansam_floral_collection' ? router.push('/broadcasts/floral') : setCurrentStep(1)}
               onBack={() => router.push('/broadcasts')}
             />
           )}

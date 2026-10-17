@@ -18,6 +18,7 @@ import { resumeAwaitingReply, runAutomationsForTrigger } from '@/lib/automations
 import { dispatchInboundToFlows } from '@/lib/flows/engine'
 import { dispatchInboundToAiReply } from '@/lib/ai/auto-reply'
 import { dispatchWebhookEvent } from '@/lib/webhooks/deliver'
+import { mirrorFloralDeliveryStatus } from '@/lib/floral-campaign-status'
 import {
   handleTemplateWebhookChange,
   isTemplateWebhookField,
@@ -293,7 +294,7 @@ async function processWebhook(body: { entry?: WhatsAppWebhookEntry[] }) {
       // Handle status updates
       if (value.statuses) {
         for (const status of value.statuses) {
-          await handleStatusUpdate(status)
+          await handleStatusUpdate(status, value.metadata?.phone_number_id)
         }
       }
 
@@ -414,7 +415,7 @@ async function handleStatusUpdate(status: {
   timestamp: string
   recipient_id: string
   errors?: MetaStatusError[]
-}) {
+}, phoneNumberId?: string) {
   // Meta's reason for a failed send (#535). Only read on `failed`; a
   // later non-failed status for the same wamid leaves the error
   // columns alone rather than clearing them, so the reason survives.
@@ -500,6 +501,11 @@ async function handleStatusUpdate(status: {
       console.error('Error updating broadcast recipient status:', recUpdateErr)
     }
   }
+
+  // Keep paced floral campaigns in sync without regressing read/delivered
+  // recipients when Meta delivers status events out of order.
+  await mirrorFloralDeliveryStatus(supabaseAdmin(), phoneNumberId, status.id, status.status,
+    failure ? `[${failure.code}] ${failure.title}${failure.details ? `: ${failure.details}` : ''}` : undefined)
 
   // 3) Webhook fan-out for messages we store (inbox / API sends).
   //    Runs last so a slow subscriber can't delay the mirrors above.
